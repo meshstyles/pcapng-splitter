@@ -12,4 +12,10 @@ This only works for smaller pcapng files.
 
 # how to use
 
-run `npm run dev` to start the server and use `npm run build` to initate a build of the page.
+Run `npm run dev` to start the server and use `npm run build` to initate a build of the page.
+Or consider using the online version of the tool [https://meshstyles.github.io/pcapng-splitter/](https://meshstyles.github.io/pcapng-splitter/)
+
+# Screenshot
+
+![screenshot](./docs/img/pcapng%20splitter.png "Title")  
+Shown here is a PcapNG sample [https://wiki.wireshark.org/samplecaptures](https://wiki.wireshark.org/samplecaptures) "200722_tcp_anon.pcapng"
