@@ -13,7 +13,7 @@ function App() {
     return (
         <>
             <h1>PCAPNG SPLITTER</h1>
-            <h2>Putputs a PcapNg packet by packet</h2>
+            <h2>Outputs a PcapNG packet by packet</h2>
             <Upload setFile={setFile}></Upload>
             <Select
                 chosenOption={selectedOption}
