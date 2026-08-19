@@ -7,7 +7,7 @@ interface props {
 export function Select(props: props) {
     const { options, chosenOption, setOption } = props;
 
-    const handleChange = (event) => {
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setOption(event.target.value);
     };
 
