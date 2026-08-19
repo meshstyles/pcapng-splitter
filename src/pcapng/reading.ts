@@ -5,9 +5,14 @@ import {
     type Endianness,
 } from "./statics";
 
-export async function readPcapng(file: File | null): Promise<string[]> {
+export async function readPcapng(
+    file: File | null,
+    selectionType: string,
+): Promise<string[]> {
+    const joiner = getJoinChars(selectionType);
+
     const returner: string[] = [];
-    if (file === null) return ["null value"];
+    if (file === null) return ["No file found"];
     const buffer = await file.arrayBuffer();
     const viewer = new DataView(buffer);
     const dataStream = new Uint8Array(buffer);
@@ -33,18 +38,17 @@ export async function readPcapng(file: File | null): Promise<string[]> {
 
     const shb = dataStream.slice(0, shbLength);
 
-    const hex = Array.from(shb)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join(" ");
-    returner.push(hex);
+    const hexData = getBytesAsHex(shb, selectionType);
+    returner.push(hexData.join(joiner));
 
     const newPointer = shbLength;
     let length = viewer.getInt32(newPointer + 4, isTypelittleEndian);
     let dataBlock = dataStream.slice(shbLength, shbLength + length);
-    let block = Array.from(dataBlock)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join(" ");
-    returner.push(block);
+    // let block = Array.from(dataBlock).map((b) =>
+    //     b.toString(16).padStart(2, "0"),
+    // );
+    const block = getBytesAsHex(dataBlock, selectionType);
+    returner.push(block.join(joiner));
 
     let currentBlockPointer = shbLength + length;
     while (currentBlockPointer < dataLength) {
@@ -53,10 +57,11 @@ export async function readPcapng(file: File | null): Promise<string[]> {
             currentBlockPointer,
             currentBlockPointer + length,
         );
-        block = Array.from(dataBlock)
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join(" ");
-        returner.push(block);
+        // block = Array.from(dataBlock).map((b) =>
+        //     b.toString(16).padStart(2, "0"),
+        // );
+        const currentBlock = getBytesAsHex(dataBlock, selectionType);
+        returner.push(currentBlock.join(joiner));
         currentBlockPointer = currentBlockPointer + length;
     }
 
@@ -68,4 +73,25 @@ function getEndianessFromMagicValue(magicValue: number): Endianness {
     if (magicValue === MAGIC_VALUE.BIG_ENDIAN) return "big_endian";
     else if (magicValue === MAGIC_VALUE.LITTLE_ENDIAN) return "little_endian";
     else return "unknown";
+}
+
+function getBytesAsHex(
+    dataBlock: Uint8Array<ArrayBuffer>,
+    exportType: string,
+): string[] {
+    if (exportType === "java") {
+        return Array.from(dataBlock).map((b) =>
+            b.toString(16).padStart(2, "0").padStart(11, "(byte) 0x"),
+        );
+    } else {
+        return Array.from(dataBlock).map((b) =>
+            b.toString(16).padStart(2, "0"),
+        );
+    }
+}
+
+function getJoinChars(exportType: string): string {
+    if (exportType === "java") return ", ";
+    else if (exportType === "hexstring") return "";
+    else return " ";
 }
