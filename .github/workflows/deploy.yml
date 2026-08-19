@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
     push:
         branches:
-            - master
+            - main
 
     # Optional: lets you manually trigger a deployment
     workflow_dispatch:
